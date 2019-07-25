@@ -56,6 +56,16 @@ push_$(1):
 .PHONY: push_$(1)
 endef
 
+define create_manifest # (1=version)
+docker manifest create -a $(STEM)-$(OSNICK):$(1) \
+	-a $(STEM)-$(OSNICK):$(VERSION)-x64 \
+	-a $(STEM)-$(OSNICK):$(VERSION)-arm64v8
+#	-a $(STEM)-$(OSNICK):$(VERSION)-arm32v7
+# docker manifest annotate $(STEM)-$(OSNICK):$(1) $(STEM)-$(OSNICK):$(VERSION)-arm32v7 --os linux --arch arm --variant v7
+docker manifest annotate $(STEM)-$(OSNICK):$(1) $(STEM)-$(OSNICK):$(VERSION)-arm64v8 --os linux --arch arm64 --variant v8
+docker manifest push -p $(STEM)-$(OSNICK):$(1)
+endef
+
 #----------------------------------------------------------------------------------------------
 
 all: build publish
@@ -75,15 +85,9 @@ publish: $(PUSH_TARGETS)
 else
 publish:
 endif
-	docker manifest create -a $(STEM)-$(OSNICK):$(VERSION) \
-		-a $(STEM)-$(OSNICK):$(VERSION)-x64 \
-		-a $(STEM)-$(OSNICK):$(VERSION)-arm64v8
-#		-a $(STEM)-$(OSNICK):$(VERSION)-arm32v7
-#	docker manifest annotate $(STEM)-$(OSNICK):$(VERSION) $(STEM)-$(OSNICK):$(VERSION)-arm32v7 --os linux --arch arm --variant v7
-	docker manifest annotate $(STEM)-$(OSNICK):$(VERSION) $(STEM)-$(OSNICK):$(VERSION)-arm64v8 --os linux --arch arm64 --variant v8
-	docker manifest push -p $(STEM)-$(OSNICK):$(VERSION)
-	docker tag $(STEM)-$(OSNICK):$(VERSION) $(STEM)-$(OSNICK):latest
-
+	$(call create_manifest,$(VERSION))
+	$(call create_manifest,latest)
+	
 show:
 	@echo "$(STEM)-$(OSNICK):"
 ifeq ($(INSPECT),1)
