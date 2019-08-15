@@ -57,6 +57,23 @@ fetch deps:
 
 #----------------------------------------------------------------------------------------------
 
+test:
+ifeq ($(wildcard venv/.),)
+	@python3 -m venv test/venv
+	@set -e ;\
+	cd test ;\
+	. venv/bin/activate ;\
+	pip -q install git+https://github.com/RedisLabsModules/RLTest@py3 ;\
+	pip -q install -r test_requirements.txt
+	@git lfs pull
+endif
+	@set -e ;\
+	cd test ;\
+	. venv/bin/activate ;\
+	python3 -m RLTest --test basic_tests.py --module $(TARGET)
+
+#----------------------------------------------------------------------------------------------
+
 pack: BINDIR
 	$(SHOW)INTO=$(INTO) BRANCH=$(BRANCH) ./pack.sh
 

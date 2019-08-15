@@ -80,9 +80,7 @@ jobs:
       - run:
           name: Package
           command: >-
-            ramp pack -m /workspace/ramp.yml -o
-            /workspace/build/$PACKAGE_NAME.{os}-{architecture}.$CIRCLE_BRANCH.zip
-            /workspace/$MODULE_ARTIFACT
+            ramp pack -m /workspace/ramp.yml -o /workspace/build/$PACKAGE_NAME.{os}-{architecture}.$CIRCLE_BRANCH.zip /workspace/$MODULE_ARTIFACT
           environment:
             LD_LIBRARY_PATH: /workspace
       - persist_to_workspace:
@@ -100,17 +98,13 @@ jobs:
       - run:
           name: Package
           command: >-
-            ramp pack -m /workspace/ramp.yml -o
-            /workspace/build/$PACKAGE_NAME.{os}-{architecture}.{semantic_version}.zip
-            /workspace/$MODULE_ARTIFACT
+            ramp pack -m /workspace/ramp.yml -o /workspace/build/$PACKAGE_NAME.{os}-{architecture}.{semantic_version}.zip /workspace/$MODULE_ARTIFACT
           environment:
             LD_LIBRARY_PATH: /workspace
       - run:
           name: Package
           command: >-
-            ramp pack -m /workspace/ramp.yml -o
-            /workspace/build/$PACKAGE_NAME.{os}-{architecture}.latest.zip
-            /workspace/$MODULE_ARTIFACT
+            ramp pack -m /workspace/ramp.yml -o /workspace/build/$PACKAGE_NAME.{os}-{architecture}.latest.zip /workspace/$MODULE_ARTIFACT
           environment:
             LD_LIBRARY_PATH: /workspace
 
@@ -129,8 +123,7 @@ jobs:
       - run:
           name: Deploy to S3
           command: >-
-            aws s3 cp /workspace/build/ s3://redismodules/$PACKAGE_NAME/ --acl
-            public-read --recursive --exclude "*" --include "*.zip"
+            aws s3 cp /workspace/build/ s3://redismodules/$PACKAGE_NAME/ --acl public-read --recursive --exclude "*" --include "*.zip"
   deploy_release:
     docker:
       - image: 'redislabsmodules/rmbuilder:latest'
@@ -140,8 +133,7 @@ jobs:
       - run:
           name: Deploy to S3
           command: >-
-            aws s3 cp /workspace/build/ s3://redismodules/$PACKAGE_NAME/ --acl
-            public-read --recursive --exclude "*" --include "*.zip"
+            aws s3 cp /workspace/build/ s3://redismodules/$PACKAGE_NAME/ --acl public-read --recursive --exclude "*" --include "*.zip"
   deploy_docs:
     docker:
       - image: 'redislabsmodules/rmbuilder:latest'
@@ -153,8 +145,7 @@ jobs:
       - run:
           name: Deploy Docs to S3
           command: >-
-            aws s3 cp site s3://oss.redislabs.com/$WEBSITE_FOLDER/ --acl
-            public-read --recursive
+            aws s3 cp site s3://oss.redislabs.com/$WEBSITE_FOLDER/ --acl public-read --recursive
 workflows:
   version: 2
   build_and_package:

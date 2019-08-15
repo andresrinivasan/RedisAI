@@ -2,17 +2,15 @@
 
 import sys
 import os
-import popen2
+from subprocess import Popen, PIPE
 import argparse
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "deps/readies"))
 import paella
 
-os.environ["PYTHONWARNINGS"] = 'ignore:DEPRECATION::pip._internal.cli.base_command'
-
 #----------------------------------------------------------------------------------------------
 
-class RedisGearsSetup(paella.Setup):
+class RedisAISetup(paella.Setup):
     def __init__(self, nop=False):
         paella.Setup.__init__(self, nop)
 
@@ -43,8 +41,9 @@ class RedisGearsSetup(paella.Setup):
         self.group_install("'Development Tools'")
 
     def macosx(self):
-        r, w, e = popen2.popen3('xcode-select -p')
-        if r.readlines() == []:
+        p = Popen('xcode-select -p', stdout=PIPE, close_fds=True, shell=True)
+        p.communicate()
+        if p.stdout.readlines() == []:
             fatal("Xcode tools are not installed. Please run xcode-select --install.")
 
     def common_last(self):
@@ -59,4 +58,4 @@ parser = argparse.ArgumentParser(description='Set up system for build.')
 parser.add_argument('-n', '--nop', action="store_true", help='no operation')
 args = parser.parse_args()
 
-RedisGearsSetup(nop = args.nop).setup()
+RedisAISetup(nop = args.nop).setup()
