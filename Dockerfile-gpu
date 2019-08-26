@@ -33,14 +33,14 @@ WORKDIR /redisai
 ADD ./ /redisai
 RUN set -ex;\
     mkdir -p deps;\
-    DEPS_DIRECTORY=deps bash ./get_deps.sh
+    DEPS_DIRECTORY=deps bash ./get_deps.sh gpu
 
 # Build the source
 RUN set -ex;\
     rm -rf build;\
     mkdir -p build;\
     cd build;\
-    cmake -DDEPS_PATH=../deps/install ..;\
+    cmake -DDEVICE=gpu ..;\
     make && make install;\
     cd ..
 
@@ -50,8 +50,8 @@ FROM builder
 RUN set -ex;\
     mkdir -p /usr/lib/redis/modules/;
 
-COPY --from=builder /redisai/install/ /usr/lib/redis/modules/
+COPY --from=builder /redisai/install-gpu/ /usr/lib/redis/modules/
 
 WORKDIR /data
 EXPOSE 6379
-CMD ["redis-server", "--loadmodule", "/usr/lib/redis/modules/redisai.so"]
+CMD ["redis-server", "--protected-mode", "no", "--loadmodule", "/usr/lib/redis/modules/redisai.so"]
